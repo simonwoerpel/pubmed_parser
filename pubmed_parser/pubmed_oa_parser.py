@@ -2,10 +2,12 @@
 Parsers for PubMed XML
 """
 import os
+import re
 from lxml import etree
 from itertools import chain
 from .utils import read_xml, stringify_affiliation_rec, stringify_children
 from unidecode import unidecode
+import html2text
 
 __all__ = [
     "list_xml_path",
@@ -91,12 +93,34 @@ def parse_coi_statements(tree):
         './/*[@*="conflict"]',
         './/*[@*="conflict-interest"]',
         './/*[@*="COI-statement"]',
+        './/*[contains(translate(text(), "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"),"interest") and (contains(translate(text(), "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"),"competing") or contains(translate(text(), "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"),"declaring") or contains(translate(text(), "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"),"conflict"))]'
     )
 
-    for path in coi_paths:
+    for pi, path in enumerate(coi_paths):
         for el in tree.xpath(path):
-            yield '\n'.join(el.itertext())
-
+            coi_text = '\n'.join(el.itertext())
+            if pi != 5:
+                yield coi_text
+            else:
+                if len(coi_text) <= 36:
+                    # TODO: get filename from somewhere
+                    article_text = html2text(codecs.open(filename, 'r', encoding='utf8').read())
+                    match = re.search(coi_text, article_text, flags=re.IGNORECASE) 
+                if match is not None:
+                    start_pos = match.start()
+                    full_coi_text = ''
+                    not_newline = True
+                    i = 0
+                    while not_newline:
+                        char = article_text[start_pos + i]
+                        if char == '\n' and article_text[start_pos + i + 1] == '\n' and i > len(coi_text):
+                            not_newline = False   
+                        else:
+                            full_coi_text += article_text[start_pos + i]
+                            i += 1
+                    
+                    coi_text = full_coi_text.replace('\t', ' ').replace('\n', ' ')
+                    yield coi_text
 
 def parse_pubmed_xml(path, include_path=False, nxml=False):
     """

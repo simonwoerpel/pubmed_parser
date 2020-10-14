@@ -5,3 +5,4 @@ six
 numpy
 pytest
 pytest-cov
+html2text
