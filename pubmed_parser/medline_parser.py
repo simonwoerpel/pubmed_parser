@@ -641,7 +641,7 @@ def parse_medline_xml(
         if False, this will parse structured abstract where each section will be assigned to
         NLM category of each sections
         default: False
-     author_list: bool
+    author_list: bool
         if True, return parsed author output as a list of authors
         if False, return parsed author output as a string of authors concatenated with ``;``
         default: False
