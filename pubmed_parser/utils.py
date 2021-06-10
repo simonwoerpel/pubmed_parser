@@ -1,13 +1,18 @@
 import calendar
-import collections
+import logging
+
 try:
     from collections.abc import Iterable
-except:
+except ImportError:
     from collections import Iterable
-from time import strptime
-from six import string_types
-from lxml import etree
+
 from itertools import chain
+from time import strptime
+
+from lxml import etree
+from six import string_types
+
+log = logging.getLogger(__name__)
 
 
 def remove_namespace(tree):
@@ -31,14 +36,13 @@ def read_xml(path, nxml=False):
         tree = etree.parse(path)
         if ".nxml" in path or nxml:
             remove_namespace(tree)  # strip namespace when reading an XML file
-    except:
+    except Exception:
         try:
             tree = etree.fromstring(path)
-        except Exception:
-            print(
-                "Error: it was not able to read a path, a file-like object, or a string as an XML"
+        except Exception as e:
+            log.error(
+                f"Error: it was not able to read a path, a file-like object, or a string as an XML: {e}"  # noqa
             )
-            raise
     return tree
 
 
