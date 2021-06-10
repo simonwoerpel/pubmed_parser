@@ -4,7 +4,7 @@ Pubmed Parser: A Python Parser for PubMed Open-Access XML Subset and MEDLINE XML
 Author: Titipat Achakulvisut, Daniel E. Acuna
 """
 __version__ = "0.2.2"
-from .pubmed_oa_parser import (
+from .pubmed_oa_parser import (  # noqa
     list_xml_path,
     parse_pubmed_xml,
     parse_pubmed_references,
@@ -12,10 +12,10 @@ from .pubmed_oa_parser import (
     parse_pubmed_caption,
     parse_pubmed_table,
 )
-from .medline_parser import parse_medline_xml, parse_medline_grant_id
-from .pubmed_web_parser import (
+from .medline_parser import parse_medline_xml, parse_medline_grant_id  # noqa
+from .pubmed_web_parser import (  # noqa
     parse_xml_web,
     parse_citation_web,
     parse_outgoing_citation_web,
 )
-from .utils import pretty_print
+from .utils import pretty_print  # noqa

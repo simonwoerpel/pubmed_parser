@@ -2,10 +2,12 @@
 Parsers for PubMed XML
 """
 import os
-from lxml import etree
 from itertools import chain
-from .utils import read_xml, stringify_affiliation_rec, stringify_children
+
+from lxml import etree
 from unidecode import unidecode
+
+from .utils import read_xml, stringify_affiliation_rec, stringify_children
 
 __all__ = [
     "list_xml_path",
@@ -86,8 +88,8 @@ def parse_coi_statements(tree):
     Parse conflict of interest statements from given article tree
     """
     coi_paths = (
-        'conflict',
-        'CoiStatement',
+        "conflict",
+        "CoiStatement",
         './/*[@*="conflict"]',
         './/*[@*="conflict-interest"]',
         './/*[@*="COI-statement"]',
@@ -95,7 +97,7 @@ def parse_coi_statements(tree):
 
     for path in coi_paths:
         for el in tree.xpath(path):
-            yield '\n'.join(el.itertext())
+            yield "\n".join(el.itertext())
 
 
 def parse_pubmed_xml(path, include_path=False, nxml=False):
@@ -172,6 +174,16 @@ def parse_pubmed_xml(path, include_path=False, nxml=False):
     else:
         subjects = ""
 
+    keywords_node = tree.findall(".//kwd-group/kwd")
+    keywords = list()
+    if keywords_node is not None:
+        for k in keywords_node:
+            keyword = " ".join([k_.strip() for k_ in k.itertext()]).strip()
+            keywords.append(keyword)
+        keywords = "; ".join(keywords)
+    else:
+        keywords = ""
+
     # create affiliation dictionary
     affil_id = tree.xpath(".//aff[@id]/@id")
     if len(affil_id) > 0:
@@ -207,7 +219,7 @@ def parse_pubmed_xml(path, include_path=False, nxml=False):
             author_list.append(["", "", ref_id_list])
     author_list = flatten_zip_author(author_list)
 
-    coi_statement = '\n'.join(parse_coi_statements(tree))
+    coi_statement = "\n".join(parse_coi_statements(tree))
 
     dict_out = {
         "full_title": full_title.strip(),
@@ -222,6 +234,7 @@ def parse_pubmed_xml(path, include_path=False, nxml=False):
         "publication_year": pub_year,
         "publication_date": "{}-{}-{}".format(pub_day, pub_month, pub_year),
         "subjects": subjects,
+        "keywords": keywords,
         "coi_statement": coi_statement,
     }
     if include_path:

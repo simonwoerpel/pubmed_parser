@@ -82,18 +82,18 @@ def stringify_affiliation(node):
 def stringify_affiliation_rec(node):
     """
     Flatten and join list to string
-    ref: http://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists-in-python
+    ref: http://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists-in-python  # noqa
     """
     parts = _recur_children(node)
     parts_flatten = list(_flatten(parts))
     return " ".join(parts_flatten).strip()
 
 
-def _flatten(l):
+def _flatten(li):
     """
     Flatten list into one dimensional
     """
-    for el in l:
+    for el in li:
         if isinstance(el, Iterable) and not isinstance(el, string_types):
             for sub in _flatten(el):
                 yield sub

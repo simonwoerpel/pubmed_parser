@@ -1,15 +1,14 @@
-import sys
 import re
 import time
+
 import requests
-from lxml import etree
-from lxml import html
-from unidecode import unidecode
+from lxml import etree, html
 
 try:
     from urllib.request import urlopen
 except ImportError:
     from urllib2 import urlopen
+
 from .utils import stringify_children
 
 __all__ = ["parse_xml_web", "parse_citation_web", "parse_outgoing_citation_web"]
@@ -56,11 +55,11 @@ def parse_pubmed_web_tree(tree):
     Return
     ------
     dict_out: dict
-        A parsed output in dictionary format, dictionary keys includes 
+        A parsed output in dictionary format, dictionary keys includes
         'title', 'abstract', 'journal', 'affliation' (string of affiliation with ';' separated),
         'authors' (string with ';' separated),
         'keywords' (keywords and MeSH terms from an XML -- if MeSH term it will be 'MeSH descriptor':'MeSH name')
-        'doi', 'year' 
+        'doi', 'year'
     """
     if len(tree.xpath("//articletitle")) != 0:
         title = " ".join([title.text for title in tree.xpath("//articletitle")])
@@ -159,13 +158,13 @@ def parse_xml_web(pmid, sleep=None, save_xml=False):
     Parameters
     ----------
     pmid: str
-        A string of PMID which you want to parse from eutils    
+        A string of PMID which you want to parse from eutils
     sleep: int
         An integer of how long you want to wait after parsing one PMID from eutils
         default: None
     save_xml: bool
         if it is True, save an XML output as a string in the key ``xml`` in an output dictionary.
-        It is good to check the information in 
+        It is good to check the information in
         if it is False, we won't save a full XML to an output
         default: False
 
@@ -215,7 +214,7 @@ def extract_citations(tree):
     n_citations = re.sub("Is Cited by the Following ", "", citations_text).split(" ")[0]
     try:
         n_citations = int(n_citations)
-    except:
+    except (ValueError, TypeError):
         n_citations = 0
     return n_citations
 
@@ -308,7 +307,7 @@ def parse_citation_web(doc_id, id_type="PMC"):
     ------
     dict_out: dict
         output is a dictionary contains following keys
-        'pmc' (Pubmed Central ID), 'pmid' (Pubmed ID), 
+        'pmc' (Pubmed Central ID), 'pmid' (Pubmed ID),
         'doi' (DOI of an article),  'n_citations' (number of citations for given articles),
         'pmc_cited' (list of PMCs that cite the given PMC)
 
@@ -339,8 +338,10 @@ def parse_citation_web(doc_id, id_type="PMC"):
     pmc_cited_all.extend(pmc_cited)
     if n_pages >= 2:
         for i in range(2, n_pages + 1):
-            link = "http://www.ncbi.nlm.nih.gov/pmc/articles/{}/citedby/?page={}".format(
-                pmc, i
+            link = (
+                "http://www.ncbi.nlm.nih.gov/pmc/articles/{}/citedby/?page={}".format(
+                    pmc, i
+                )
             )
             page = requests.get(link)
             tree = html.fromstring(page.content)
