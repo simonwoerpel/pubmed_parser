@@ -521,7 +521,9 @@ def parse_article_info(
     else:
         issue = ""
 
-    if volume != "":
+    if volume == "":
+        issue = ""
+    else:
         issue = f"{volume}({issue})"
 
     if article.find("Pagination/MedlinePgn") is not None:
