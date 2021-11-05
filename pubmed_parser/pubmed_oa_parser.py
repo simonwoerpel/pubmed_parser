@@ -217,7 +217,20 @@ def parse_pubmed_xml(path, include_path=False, nxml=False):
             )
         except BaseException:
             author_list.append(["", "", ref_id_list])
-    author_list = flatten_zip_author(author_list)
+
+    # FIXME improve author / affiliate parsing
+    author_list_flat = flatten_zip_author(author_list)
+    if not author_list_flat:
+        # because of missing affiliation xrefs, add all affiliations to authors:
+        for author in author_list:
+            author[2] += [a[0] for a in affiliation_list]
+        author_list_flat = flatten_zip_author(author_list)
+        if not author_list_flat:
+            for author in author_list:
+                author[2] += [None]
+        author_list_flat = flatten_zip_author(author_list)
+
+    author_list = author_list_flat
 
     coi_statement = "\n".join(parse_coi_statements(tree))
 
