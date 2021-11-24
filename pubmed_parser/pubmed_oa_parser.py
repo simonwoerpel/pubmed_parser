@@ -93,6 +93,8 @@ def parse_coi_statements(tree):
         './/*[@*="conflict"]',
         './/*[@*="conflict-interest"]',
         './/*[@*="COI-statement"]',
+        './/notes[@notes-type="competing-interest-statement"]',
+        ".//ack",
     )
 
     for path in coi_paths:
