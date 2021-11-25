@@ -247,7 +247,7 @@ def parse_pubmed_xml(path, include_path=False, nxml=False):
         "author_list": author_list,
         "affiliation_list": affiliation_list,
         "publication_year": pub_year,
-        "publication_date": "{}-{}-{}".format(pub_day, pub_month, pub_year),
+        "publication_date": "{}-{}-{}".format(pub_year, pub_month, pub_day),
         "subjects": subjects,
         "keywords": keywords,
         "coi_statement": coi_statement,
