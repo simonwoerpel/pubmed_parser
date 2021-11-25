@@ -32,6 +32,8 @@ def read_xml(path, nxml=False):
     """
     Parse tree from given XML path
     """
+    if isinstance(path, etree._Element):
+        return path
     try:
         tree = etree.parse(path)
         if ".nxml" in path or nxml:
@@ -43,6 +45,7 @@ def read_xml(path, nxml=False):
             log.error(
                 f"Error: it was not able to read a path, a file-like object, or a string as an XML: {e}"  # noqa
             )
+            tree = None
     return tree
 
 
