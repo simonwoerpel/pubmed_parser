@@ -93,11 +93,24 @@ def parse_coi_statements(tree):
         './/*[@*="conflict"]',
         './/*[@*="conflict-interest"]',
         './/*[@*="COI-statement"]',
-        './/notes[@notes-type="competing-interest-statement"]',
-        ".//ack",
+        './/*[@*="competing-interest-statement"]',
     )
 
     for path in coi_paths:
+        for el in tree.xpath(path):
+            yield "\n".join(el.itertext())
+
+
+def parse_acknowledgements(tree):
+    """
+    Parse acknowledgements from given article tree
+    """
+    ack_paths = (
+        ".//acknowledgements",
+        ".//ack",
+    )
+
+    for path in ack_paths:
         for el in tree.xpath(path):
             yield "\n".join(el.itertext())
 
@@ -235,6 +248,7 @@ def parse_pubmed_xml(path, include_path=False, nxml=False):
     author_list = author_list_flat
 
     coi_statement = "\n".join(parse_coi_statements(tree))
+    acknowledgements = "\n".join(parse_acknowledgements(tree))
 
     dict_out = {
         "full_title": full_title.strip(),
@@ -251,6 +265,7 @@ def parse_pubmed_xml(path, include_path=False, nxml=False):
         "subjects": subjects,
         "keywords": keywords,
         "coi_statement": coi_statement,
+        "acknowledgements": acknowledgements,
     }
     if include_path:
         dict_out["path_to_file"] = path
